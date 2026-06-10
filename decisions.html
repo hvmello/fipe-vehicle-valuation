@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FIPE Vehicle Valuation — Decisions in Plain Terms</title>
+<style>
+  :root {
+    --bg: #0f1419; --card: #1a2230; --line: #2a3547; --text: #e6edf3;
+    --muted: #8b98a9; --accent: #4ea1ff; --good: #2ea043; --warn: #d99e2b;
+    --chip: #112b1a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+         background: var(--bg); color: var(--text); line-height: 1.6; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 36px 20px 72px; }
+  h1 { font-size: 1.7rem; margin: 0 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 8px; max-width: 70ch; }
+  .lead { color: var(--text); background: var(--card); border: 1px solid var(--line);
+          border-left: 3px solid var(--accent); border-radius: 10px; padding: 14px 18px;
+          margin: 22px 0 30px; max-width: none; }
+  h2 { font-size: 1.15rem; margin: 38px 0 6px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+  .h2note { color: var(--muted); font-size: .9rem; margin: 0 0 18px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+  .card h3 { margin: 0 0 4px; font-size: 1.02rem; }
+  .tag { display: inline-block; font-size: .68rem; font-weight: 700; text-transform: uppercase;
+         letter-spacing: .05em; color: var(--accent); background: #0c1b2e;
+         border: 1px solid #20364f; border-radius: 999px; padding: 2px 9px; margin-bottom: 10px; }
+  .row { margin: 9px 0; }
+  .row b { color: var(--muted); font-weight: 700; font-size: .74rem; text-transform: uppercase;
+           letter-spacing: .04em; display: block; margin-bottom: 1px; }
+  .instead { color: var(--muted); }
+  .instead em { color: var(--text); font-style: normal; font-weight: 600; }
+  code { background: #0c1118; padding: 1px 6px; border-radius: 5px; color: #b9c6d6; font-size: .88em; }
+  .full { grid-column: 1 / -1; }
+  .pill { display:inline-block; font-size:.72rem; font-weight:700; border-radius:999px; padding:2px 10px;
+          background: var(--chip); color: var(--good); border:1px solid var(--good); }
+  footer { color: var(--muted); font-size: .85rem; margin-top: 40px; border-top: 1px solid var(--line); padding-top: 16px; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Why the app is built the way it is</h1>
+  <p class="sub">FIPE Vehicle Valuation — the design choices, in plain language.</p>
+
+  <div class="lead">
+    <strong>The app in one sentence:</strong> you pick a <em>type → brand → model</em> of vehicle, and it
+    shows how that car's price changed across the years it was made — using Brazil's official FIPE price
+    tables. A <strong>Java/Spring backend</strong> does the maths and talks to FIPE; an
+    <strong>Angular screen</strong> drives it. Below is <em>what</em> we chose and, more usefully,
+    <em>why</em> — and what we chose <em>instead of</em>.
+  </div>
+
+  <h2>The big picture</h2>
+  <p class="h2note">How the whole thing is shaped.</p>
+  <div class="grid">
+    <div class="card">
+      <span class="tag">Structure</span>
+      <h3>One repository for both halves</h3>
+      <div class="row"><b>In plain terms</b>The backend and the website live in the same project folder
+        (a "monorepo"): <code>backend/</code> and <code>frontend/</code>.</div>
+      <div class="row"><b>Why</b>They're built and reviewed together and ship as one feature. Keeping them
+        side by side means one place to clone, one history, one CI pipeline — nothing to keep in sync
+        across two repos.</div>
+      <div class="row instead"><b>Instead of</b><em>Two separate repositories</em> — more overhead for a
+        single, cohesive deliverable.</div>
+    </div>
+    <div class="card">
+      <span class="tag">Method</span>
+      <h3>Write the spec first, then the code</h3>
+      <div class="row"><b>In plain terms</b>The rules (what counts as a valid answer, the edge cases) were
+        written down in <code>specs/</code> before coding, and every test points back to a numbered
+        requirement.</div>
+      <div class="row"><b>Why</b>It keeps the build honest: you can trace any behaviour to a rule, and the
+        tests prove the rules still hold after changes.</div>
+      <div class="row instead"><b>Instead of</b><em>Coding first and hoping</em> — which makes review and
+        future changes risky.</div>
+    </div>
+  </div>
+
+  <h2>The backend (the engine)</h2>
+  <p class="h2note">Java 17 + Spring Boot. These choices are about correctness, speed and safety.</p>
+  <div class="grid">
+    <div class="card">
+      <span class="tag">Concurrency</span>
+      <h3>Reactive (WebFlux), not the classic blocking style</h3>
+      <div class="row"><b>In plain terms</b>One valuation has to ask FIPE for the price of <em>each</em>
+        year of the car — many small calls. We fire those off <strong>at the same time</strong> instead of
+        one-after-another, using Spring's reactive "WebFlux" toolkit.</div>
+      <div class="row"><b>Why</b>The work is mostly <em>waiting on the network</em>. Doing the calls in
+        parallel (with a sensible limit) makes a valuation noticeably faster and uses threads efficiently.</div>
+      <div class="row instead"><b>Instead of</b><em>Classic blocking Spring MVC</em>, where each call waits
+        for the previous one — simpler to read, but slower for this "fan-out of many calls" shape.</div>
+    </div>
+    <div class="card">
+      <span class="tag">Money</span>
+      <h3>Exact decimals for money — never "floats"</h3>
+      <div class="row"><b>In plain terms</b>All prices use <code>BigDecimal</code> (exact decimal numbers),
+        rounded to two places like real currency.</div>
+      <div class="row"><b>Why</b>Ordinary computer decimals (floating point) can't represent money exactly —
+        you get tiny errors like 0.1 + 0.2 = 0.30000000000004. For a <em>valuation</em> app, that's
+        unacceptable. Exact decimals avoid it entirely.</div>
+      <div class="row instead"><b>Instead of</b><em><code>double</code>/<code>float</code></em> — fast, but
+        wrong for cents.</div>
+    </div>
+    <div class="card">
+      <span class="tag">Resilience</span>
+      <h3>Retry the blips, surface the real failures</h3>
+      <div class="row"><b>In plain terms</b>FIPE's free service occasionally drops a connection. If a call
+        fails for that kind of temporary reason, we quietly try again a couple of times.</div>
+      <div class="row"><b>Why</b>Most hiccups vanish on a second try, so the user never sees them. But we
+        <strong>never</strong> retry a genuine "not found" — that's a real answer, not a blip.</div>
+      <div class="row instead"><b>Instead of</b><em>Failing on the first hiccup</em>, or blindly retrying
+        everything (which would hammer FIPE and hide real errors).</div>
+    </div>
+    <div class="card">
+      <span class="tag">Errors</span>
+      <h3>Honest, specific error responses</h3>
+      <div class="row"><b>In plain terms</b>A bad vehicle type returns "400 — bad request", a missing car
+        returns "404 — not found", and a FIPE outage returns "502 — upstream unavailable", each with a
+        clear message (a standard format called ProblemDetail).</div>
+      <div class="row"><b>Why</b>The website (and any other caller) can react correctly, and we never leak
+        scary internal stack traces to users.</div>
+      <div class="row instead"><b>Instead of</b><em>A generic "500 error"</em> for everything — unhelpful and
+        opaque.</div>
+    </div>
+    <div class="card">
+      <span class="tag">Parsing</span>
+      <h3>Read Brazilian prices the locale-correct way</h3>
+      <div class="row"><b>In plain terms</b>FIPE sends prices as text like <code>"R$ 1.234.567,89"</code>
+        (dots for thousands, comma for decimals). We turn that into a number using Java's built-in
+        Brazilian-number reader, and reject anything malformed.</div>
+      <div class="row"><b>Why</b>It's precise and clear, and it won't silently misread a broken value.</div>
+      <div class="row instead"><b>Instead of</b><em>Hand-rolled text chopping with regex</em> — easy to get
+        subtly wrong.</div>
+    </div>
+    <div class="card">
+      <span class="tag">Security</span>
+      <h3>Locked down by default</h3>
+      <div class="row"><b>In plain terms</b>The API only accepts the website's address, only the safe
+        "read" actions, and adds standard protective headers on every response.</div>
+      <div class="row"><b>Why</b>Small, sensible defaults reduce the attack surface for free. There's no
+        login because the data is <strong>public, read-only</strong> FIPE data — nothing to protect behind a
+        password.</div>
+      <div class="row instead"><b>Instead of</b><em>Wide-open settings</em>, or <em>bolting on a login</em>
+        that guards nothing.</div>
+    </div>
+  </div>
+
+  <h2>The caching strategy</h2>
+  <p class="h2note">FIPE is slow and rate-limited, and its prices only change once a month. Caching is where
+    a lot of the "smarts" live, so here's the thinking in detail — still in plain terms.</p>
+  <div class="grid">
+    <div class="card">
+      <span class="tag">Pattern</span>
+      <h3>Caching is a wrapper around the FIPE client</h3>
+      <div class="row"><b>In plain terms</b>The part that talks to FIPE doesn't know about caching at all.
+        A separate "wrapper" sits in front of it and remembers answers (the decorator pattern).</div>
+      <div class="row"><b>Why</b>Each piece does one job. We can change caching without touching the FIPE
+        code, and the rest of the app is none the wiser.</div>
+      <div class="row instead"><b>Instead of</b><em>Spring's <code>@Cacheable</code> annotation</em>, which
+        for this reactive style would cache the "recipe" instead of the actual answer — a subtle bug.</div>
+    </div>
+    <div class="card">
+      <span class="tag">Two speeds</span>
+      <h3>Catalog and prices are cached differently</h3>
+      <div class="row"><b>In plain terms</b>The lists of brands/models (the "catalog") barely change, so we
+        keep them for a long time. <strong>Prices</strong> change monthly, so they're kept more briefly and
+        tagged with which month they belong to.</div>
+      <div class="row"><b>Why</b>One-size-fits-all would either drop the stable lists too soon or hold stale
+        prices too long. Two speeds fit each kind of data.</div>
+      <div class="row instead"><b>Instead of</b><em>A single cache with one expiry</em> for everything.</div>
+    </div>
+    <div class="card">
+      <span class="tag">RAM</span>
+      <h3>Keep the popular cars, drop the rest (hot/cold)</h3>
+      <div class="row"><b>In plain terms</b>We don't try to hold every car in memory. The cache has a size
+        limit and automatically keeps the <strong>frequently looked-up</strong> cars while letting rarely
+        used ones fall out — they're simply re-fetched if someone wants them later.</div>
+      <div class="row"><b>Why</b>It uses a sensible, bounded amount of memory no matter how big FIPE is,
+        while still being fast for the cars people actually look at.</div>
+      <div class="row instead"><b>Instead of</b><em>Pre-loading the entire FIPE catalogue</em> — huge memory
+        use for data nobody may request.</div>
+    </div>
+    <div class="card">
+      <span class="tag">Freshness</span>
+      <h3>A new monthly table is a trigger, not just a timer</h3>
+      <div class="row"><b>In plain terms</b>The app checks daily which month FIPE is publishing. The moment
+        that changes, it <strong>throws away the old prices</strong> so the next lookups fetch the new ones.</div>
+      <div class="row"><b>Why</b>Prices change on a known event (the monthly update), so reacting to that
+        event is fresher and cheaper than just hoping a short timer expires at the right moment.</div>
+      <div class="row instead"><b>Instead of</b><em>Only waiting for a fixed expiry</em>, which could serve
+        last month's prices for hours after the update.</div>
+    </div>
+    <div class="card full">
+      <span class="tag">In memory</span>
+      <h3>The cache lives inside the app (no Redis)</h3>
+      <div class="row"><b>In plain terms</b>The cache is held in the running app's own memory, not in a
+        separate shared service like Redis.</div>
+      <div class="row"><b>Why</b>For a single instance this is the simplest thing that works well — no extra
+        moving parts to run or maintain. <span class="instead"><b>Honest trade-off:</b> the cache is lost on
+        restart and isn't shared if you run several copies of the app. If this ever needs to scale to many
+        instances, a shared cache (Redis) is the documented next step.</span></div>
+    </div>
+  </div>
+
+  <h2>The frontend (the screen)</h2>
+  <p class="h2note">Angular 18. Choices here are about being easy to use and easy to maintain.</p>
+  <div class="grid">
+    <div class="card">
+      <span class="tag">Find a car</span>
+      <h3>Type to search the model, don't scroll 500 of them</h3>
+      <div class="row"><b>In plain terms</b>Some brands (Ford, VW) have ~500 models. Instead of a giant
+        dropdown, you <strong>type a few letters</strong> and it filters to matches.</div>
+      <div class="row"><b>Why</b>We measured it: the backend answers in well under a tenth of a second — the
+        slowness was the browser drawing 500 rows. Typing shows only a handful, so it's instant, and you
+        find a specific car faster.</div>
+      <div class="row instead"><b>Instead of</b><em>Pagination</em> (clicking through pages) or a
+        <em>plain 500-item dropdown</em> — both clumsy for this many options.</div>
+    </div>
+    <div class="card">
+      <span class="tag">State</span>
+      <h3>Modern, lightweight Angular</h3>
+      <div class="row"><b>In plain terms</b>The screen uses Angular's newest building blocks (standalone
+        components and "signals" for state) and one typed service that does all the talking to the backend.</div>
+      <div class="row"><b>Why</b>Less boilerplate, clearer data flow, and the components stay simple to read
+        and test.</div>
+      <div class="row instead"><b>Instead of</b><em>Older, heavier patterns</em> (NgModules, manual
+        subscriptions, scattered HTTP calls).</div>
+    </div>
+    <div class="card">
+      <span class="tag">Clarity</span>
+      <h3>"Nothing found" looks different from "something broke"</h3>
+      <div class="row"><b>In plain terms</b>If a search genuinely has no results, you get a calm
+        informational note. If something actually failed, you get a clear error with a "try again" nudge.</div>
+      <div class="row"><b>Why</b>They're different situations and shouldn't look the same — one is normal, one
+        needs attention.</div>
+      <div class="row instead"><b>Instead of</b><em>One generic red error</em> for both.</div>
+    </div>
+    <div class="card">
+      <span class="tag">Readability</span>
+      <h3>Prices and changes shown the Brazilian way</h3>
+      <div class="row"><b>In plain terms</b>Values are formatted as <code>R$</code> in Brazilian style, and
+        year-on-year changes are coloured green (up) or red (down) with an arrow — not colour alone.</div>
+      <div class="row"><b>Why</b>It matches what a Brazilian user expects, and the arrow keeps it readable for
+        colour-blind users too.</div>
+      <div class="row instead"><b>Instead of</b><em>Raw numbers</em> or <em>colour-only</em> signals.</div>
+    </div>
+  </div>
+
+  <h2>What we deliberately did <em>not</em> do</h2>
+  <p class="h2note">Good engineering is also knowing where to stop. These are conscious "no"s, not oversights.</p>
+  <div class="grid">
+    <div class="card">
+      <span class="tag">Scope</span>
+      <h3>No shared cache, no login, no extra infrastructure</h3>
+      <div class="row"><b>Why</b>A shared cache (Redis) and authentication add real complexity that this
+        single-instance, public, read-only app doesn't need. Each is documented as a clear next step if the
+        requirements ever grow.</div>
+    </div>
+    <div class="card">
+      <span class="tag">Dependencies</span>
+      <h3>We didn't force a risky framework upgrade</h3>
+      <div class="row"><b>Why</b>A dependency scanner flags issues in Angular's <em>build tools</em> (not in
+        the shipped app). The only "fix" is a breaking jump to a much newer Angular — which would be a
+        separate, carefully-tested migration, not something to slip in here.</div>
+    </div>
+  </div>
+
+  <footer>
+    The functional rules behind these choices live in <code>specs/001-vehicle-valuation/</code>;
+    milestone history is in <code>progress.html</code>. Current status:
+    backend <span class="pill">56 tests ✓</span> &nbsp; frontend <span class="pill">12 specs ✓</span>
+    &nbsp; both build clean.
+  </footer>
+</div>
+</body>
+</html>

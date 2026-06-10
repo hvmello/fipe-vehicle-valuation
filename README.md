@@ -13,8 +13,8 @@ previous available year**, newest first — with an **Angular 18 + Material** sc
 
 The design is **spec-driven**: the source of truth is [`specs/001-vehicle-valuation/`](specs/001-vehicle-valuation)
 (functional spec, data model, API contract, tasks), and every test references the requirement id it verifies.
-Key trade-offs are written up in [`docs/DECISIONS.md`](docs/DECISIONS.md); progress is tracked in
-[`progress.html`](progress.html).
+The design choices (and what they were chosen against) are explained in plain language in
+[`decisions.html`](decisions.html); progress is tracked in [`progress.html`](progress.html).
 
 ## Architecture
 
@@ -100,8 +100,8 @@ Then pick **Tipo → Marca → Modelo** and press **Consultar**. (Run the backen
 ## Tests
 
 ```bash
-cd backend  && ./mvnw test        # 54 tests (unit, service, controller, integration, security, cache, references)
-cd frontend && npm run test:ci    # 9 specs (service + components), headless Chrome
+cd backend  && ./mvnw test        # 56 tests (unit, service, controller, integration, security, cache, references)
+cd frontend && npm run test:ci    # 12 specs (service + components), headless Chrome
 ```
 
 Both suites run automatically on every push/PR via [GitHub Actions](.github/workflows/ci.yml).
@@ -131,7 +131,7 @@ Both suites run automatically on every push/PR via [GitHub Actions](.github/work
   full-consumption validation so malformed amounts are rejected, not silently truncated.
 - **Swagger UI** (springdoc) at `/swagger-ui.html`; the full contract is also in `specs/.../api-contract.md`.
 
-See [`docs/DECISIONS.md`](docs/DECISIONS.md) for the trade-offs behind each choice.
+See [`decisions.html`](decisions.html) for the reasoning behind each choice, in plain terms.
 
 ## License
 
