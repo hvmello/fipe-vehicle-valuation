@@ -1,0 +1,42 @@
+# ---- Build output ----
+# Java / Maven
+backend/target/
+*.class
+*.jar
+*.war
+!**/maven-wrapper.jar
+
+# Angular / Node
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+node_modules/
+dist/
+
+# ---- Logs & runtime artifacts ----
+*.log
+backend/run-backend.log
+frontend/run-frontend.log
+frontend/karma-out.txt
+backend/e2e-run.log
+
+# ---- IDE / editor ----
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Local tooling / secrets ----
+.claude/
+*.local
+.env
+.env.*

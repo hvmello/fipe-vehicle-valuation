@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FIPE Vehicle Valuation — Milestone Tracker</title>
+<style>
+  :root {
+    --bg: #0f1419; --card: #1a2230; --line: #2a3547; --text: #e6edf3;
+    --muted: #8b98a9; --accent: #4ea1ff;
+    --pending: #6b7280; --progress: #d99e2b; --done: #2ea043; --done-bg: #112b1a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+         background: var(--bg); color: var(--text); line-height: 1.5; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 32px 20px 64px; }
+  h1 { font-size: 1.6rem; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 24px; }
+  .bar { height: 10px; background: var(--line); border-radius: 6px; overflow: hidden; margin: 8px 0 28px; }
+  .bar > span { display: block; height: 100%; background: linear-gradient(90deg, #2ea043, #4ea1ff); width: 9%; transition: width .4s; }
+  .meta { display: flex; gap: 18px; flex-wrap: wrap; color: var(--muted); font-size: .85rem; margin-bottom: 28px; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin-bottom: 22px; }
+  section h2 { font-size: 1.05rem; margin: 0 0 14px; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
+  td.id { font-weight: 700; color: var(--accent); white-space: nowrap; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: .72rem; font-weight: 700;
+           text-transform: uppercase; letter-spacing: .03em; }
+  .b-pending  { background: #20262f; color: var(--pending); border: 1px solid var(--pending); }
+  .b-progress { background: #2a2410; color: var(--progress); border: 1px solid var(--progress); }
+  .b-done     { background: var(--done-bg); color: var(--done); border: 1px solid var(--done); }
+  .skill { font-size: .78rem; color: var(--muted); }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: .8rem; color: var(--muted); margin-top: 10px; }
+  code { background: #0c1118; padding: 1px 6px; border-radius: 5px; color: #b9c6d6; font-size: .85em; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>FIPE Vehicle Valuation — Milestone Tracker</h1>
+  <p class="sub">Spec-driven build · Java 17 + Spring Boot (WebFlux) backend · Angular 18 + Material frontend</p>
+  <div class="bar"><span style="width:100%"></span></div>
+  <div class="meta">
+    <span><strong>21</strong> / 21 milestones done — backend 54 tests · frontend 9 specs · round 3 caching (two-tier hot/cold, reference-triggered price refresh, virtual-scroll dropdown) · LIVE ✓</span>
+    <span>Spec: <a href="specs/001-vehicle-valuation/spec.md">001-vehicle-valuation</a></span>
+    <span>Protocol: gated — one milestone at a time, verified before next</span>
+  </div>
+
+  <section>
+    <h2>Milestones</h2>
+    <table>
+      <thead><tr><th>#</th><th>Milestone</th><th>Skill</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td class="id">M0</td><td>Project setup: repo layout, skills, <code>specs/</code> (verified vs live API), tracker</td><td class="skill">—</td><td><span class="badge b-done">Done</span></td></tr>
+        <tr><td class="id">M1</td><td>Backend skeleton: Maven <code>pom.xml</code> (Spring Boot 3.5.3, Java 17), app, <code>application.yml</code>, config — context-load test green (offline via mvnd)</td><td class="skill">backend</td><td><span class="badge b-done">Done</span></td></tr>
+        <tr><td class="id">M2</td><td>FIPE client + wire DTOs + <code>VehicleType</code> — 10 tests green (client via stubbed ExchangeFunction)</td><td class="skill">backend</td><td><span class="badge b-done">Done</span></td></tr>
+        <tr><td class="id">M3</td><td><code>BrazilianCurrencyParser</code> + domain — 13 parser tests green (millions, zero, NBSP, HALF_UP, malformed)</td><td class="skill">backend</td><td><span class="badge b-done">Done</span></td></tr>
+        <tr><td class="id">M4</td><td><code>VehicleValuationService</code> — core delta/percentage algorithm — 7 tests green (skipped-year, 0 km, Fusca multi-fuel, ÷0)</td><td class="skill">backend</td><td><span class="badge b-done">Done</span></td></tr>
+        <tr><td class="id">M5</td><td>Controller + DTOs + ProblemDetail (404/400/502) + reactive Caffeine cache + Swagger UI (/swagger-ui.html, verified live) — 5 controller tests green</td><td class="skill">backend</td><td><span class="badge b-done">Done</span></td></tr>
+        <tr><td class="id">M6</td><td>Backend tests: parser, service, controller, integration (reactor-netty stub), caching — 39 tests green</td><td class="skill">test</td><td><span class="badge b-done">Done</span></td></tr>
+        <tr><td class="id">M7</td><td>Frontend scaffold: Angular 18 + Material + proxy + pt-BR locale — <code>ng build</code> green (Material installed via trusted corporate CA)</td><td class="skill">frontend</td><td><span class="badge b-done">Done</span></td></tr>
+        <tr><td class="id">M8</td><td><code>FipeService</code> + typed models — service spec green (HttpTestingController)</td><td class="skill">frontend</td><td><span class="badge b-done">Done</span></td></tr>
+        <tr><td class="id">M9</td><td>Valuation screen + result component + styling — 8 specs green (newest-first, up/down, base, dependent selects)</td><td class="skill">frontend</td><td><span class="badge b-done">Done</span></td></tr>
+        <tr><td class="id">M10</td><td>End-to-end verification + root <code>README.md</code> — LIVE run against real FIPE verified (brands + Fiat 147 valuation)</td><td class="skill">review</td><td><span class="badge b-done">Done</span></td></tr>
+      </tbody>
+    </table>
+    <div class="legend">
+      <span><span class="badge b-pending">Pending</span> not started</span>
+      <span><span class="badge b-progress">In progress</span> being built</span>
+      <span><span class="badge b-done">Done</span> tested + reviewed</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>Refinement — Round 2 (security · code quality · UI/UX)</h2>
+    <p class="skill" style="margin-top:-4px;margin-bottom:16px">
+      Hardening and polish pass after the first end-to-end review. Same gated protocol:
+      each milestone is verified (tests + code-review) before the next. No spec FR changes —
+      these strengthen the <em>how</em>, not the <em>what</em>.</p>
+    <table>
+      <thead><tr><th>#</th><th>Milestone</th><th>Skill</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td class="id">R1</td><td><strong>CORS hardening (security).</strong> Replace <code>allowedHeaders("*")</code> with an explicit minimal allow-list (<code>Accept</code>, <code>Content-Type</code>); keep GET/OPTIONS only; set <code>maxAge</code>; no credentials. Add security response headers (<code>X-Content-Type-Options</code>, <code>X-Frame-Options</code>, <code>Referrer-Policy</code>) via a WebFilter. New test asserting CORS + header policy.</td><td class="skill">backend</td><td><span class="badge b-done">Done</span></td></tr>
+        <tr><td class="id">R2</td><td><strong>Regex-free currency parser.</strong> Rewrite <code>BrazilianCurrencyParser</code> with <code>DecimalFormat</code> + <code>DecimalFormatSymbols(pt-BR)</code> and <code>setParseBigDecimal(true)</code> — locale-correct, no <code>replaceAll</code> string surgery. All 13 existing parser tests stay green; add malformed/locale edge cases.</td><td class="skill">backend</td><td><span class="badge b-done">Done</span></td></tr>
+        <tr><td class="id">R3</td><td><strong>Cache made visible &amp; tunable.</strong> Cache already exists (Caffeine <code>AsyncCache</code>, 6h TTL, 10k max) but config is buried in defaults. Surface <code>fipe.cache.ttl</code> / <code>maximum-size</code> in <code>application.yml</code> with comments; expose Actuator cache metrics; document TTL rationale (FIPE refreshes monthly) in README (NFR-4/NFR-8).</td><td class="skill">backend</td><td><span class="badge b-done">Done</span></td></tr>
+        <tr><td class="id">R4</td><td><strong>UI/UX foundation.</strong> Custom Material 3 theme + typography scale; 8px spacing system and vertical rhythm; card padding, page width and hierarchy. Fixes cramped layout — establishes the design tokens R5 builds on.</td><td class="skill">frontend</td><td><span class="badge b-done">Done</span></td></tr>
+        <tr><td class="id">R5</td><td><strong>Results &amp; states polish (a11y).</strong> Fix crowded cells — stack year/fuel and delta/relation with real line-height &amp; gaps; right-align numerics; zebra/hover rows; accessible green/red deltas (icon + AA contrast, not colour alone). Polish loading/empty/error states. WCAG AA contrast + focus order.</td><td class="skill">frontend</td><td><span class="badge b-done">Done</span></td></tr>
+        <tr><td class="id">R6</td><td><strong>Verify &amp; regress.</strong> Backend tests (+ new CORS/parser), frontend specs + <code>ng build</code>, live e2e against real FIPE, README + this tracker updated to Done.</td><td class="skill">test / review</td><td><span class="badge b-done">Done</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Refinement — Round 3 (caching strategy &amp; dropdown performance)</h2>
+    <p class="skill" style="margin-top:-4px;margin-bottom:16px">
+      Make the cache <em>smart</em>, not just present. Hot/cold working set via bounded,
+      frequency-aware Caffeine (no bulk prefetch); FIPE's monthly reference-table update treated as an
+      active trigger to refresh prices; large model lists rendered instantly. Same gated protocol.</p>
+    <table>
+      <thead><tr><th>#</th><th>Milestone</th><th>Skill</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td class="id">C1</td><td><strong>FIPE <code>references()</code> + current-reference provider.</strong> New client call (<code>GET /references</code> → <code>{code,month}</code>) reusing the transient-retry; <code>CurrentReferenceProvider</code> resolves the latest reference at startup and re-checks daily (<code>@Scheduled</code>), detecting a change and firing a hook. Keeps last-known value on FIPE error.</td><td class="skill">backend</td><td><span class="badge b-done">Done</span></td></tr>
+        <tr><td class="id">C2</td><td><strong>Differentiated bounded caches + reference-triggered invalidation.</strong> Split into <code>catalog</code> (7d, stable) and <code>price</code> (24h, reference-keyed) caches with their own size bounds (hot stays, cold evicted via W-TinyLFU). On reference change → invalidate the price cache (free old-month RAM). Config surfaced in <code>application.yml</code>; meters <code>fipe.catalog</code>/<code>fipe.prices</code>.</td><td class="skill">backend</td><td><span class="badge b-done">Done</span></td></tr>
+        <tr><td class="id">C3</td><td><strong>Virtual-scroll model dropdown.</strong> CDK <code>cdk-virtual-scroll-viewport</code> on the model <code>mat-select</code> so big brands render instantly; explicit <code>mat-select-trigger</code> + <code>selectedModelName()</code> computed to keep the selected label correct under virtualization.</td><td class="skill">frontend</td><td><span class="badge b-done">Done</span></td></tr>
+        <tr><td class="id">C4</td><td><strong>Verify &amp; document.</strong> Backend tests (references, provider change-detection, price-cache busts on reference change), frontend specs + build, live e2e, README caching section.</td><td class="skill">test / review</td><td><span class="badge b-done">Done</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Skills (role harness)</h2>
+    <table>
+      <thead><tr><th>Skill</th><th>Purpose</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td class="id">backend-java-engineer</td><td>Spring Boot / Java 17 / WebFlux, BigDecimal money, ProblemDetail, cache</td><td><span class="badge b-done">Created</span></td></tr>
+        <tr><td class="id">frontend-angular-engineer</td><td>Angular 18 standalone + Signals + Material, typed services</td><td><span class="badge b-done">Created</span></td></tr>
+        <tr><td class="id">test-engineer</td><td>JUnit 5 + MockWebServer + StepVerifier + @WebFluxTest; Angular specs</td><td><span class="badge b-done">Created</span></td></tr>
+        <tr><td class="id">code-reviewer</td><td>Reviews each milestone vs evaluation criteria before Done</td><td><span class="badge b-done">Created</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Spec-driven harness</h2>
+    <p class="skill">Source of truth in <code>specs/001-vehicle-valuation/</code>:
+      <a href="specs/001-vehicle-valuation/spec.md">spec.md</a> ·
+      <a href="specs/001-vehicle-valuation/data-model.md">data-model.md</a> ·
+      <a href="specs/001-vehicle-valuation/api-contract.md">api-contract.md</a> ·
+      <a href="specs/001-vehicle-valuation/tasks.md">tasks.md</a>.
+      Every test references the FR/UI id it verifies; a milestone is Done only when its
+      acceptance tests pass and code-review clears.</p>
+  </section>
+</div>
+</body>
+</html>
