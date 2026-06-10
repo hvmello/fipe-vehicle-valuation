@@ -1,0 +1,81 @@
+@use '@angular/material' as mat;
+
+// Structural styles for Material + CDK overlay (mat-select panels, ripples,
+// backdrop). Required once, globally — without it option panels lose their
+// padding and the overlay backdrop misbehaves.
+@include mat.core();
+
+// ----------------------------------------------------------------------------
+// Material 3 theme (R4). Replaces the prebuilt azure-blue theme so component
+// colour, typography and density come from one source we control.
+// ----------------------------------------------------------------------------
+$app-theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$azure-palette,
+    tertiary: mat.$blue-palette,
+  ),
+  typography: (
+    plain-family: ('Roboto', 'Helvetica Neue', sans-serif),
+    brand-family: ('Roboto', 'Helvetica Neue', sans-serif),
+    bold-weight: 700,
+  ),
+  density: (scale: 0),
+));
+
+:root {
+  @include mat.all-component-themes($app-theme);
+  @include mat.typography-hierarchy($app-theme);
+}
+
+// ----------------------------------------------------------------------------
+// Design tokens — an 8px spacing scale, semantic colours and elevation, used
+// across the app so spacing/colour stay consistent (R4).
+// ----------------------------------------------------------------------------
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-pill: 999px;
+
+  --bg: #eef1f6;
+  --surface: #ffffff;
+  --surface-muted: #f4f6fb;
+  --border: #e3e7f0;
+  --text: #1a2230;
+  --text-muted: #5d6b80;
+
+  --pos: #1b873f;        // green — WCAG AA on white
+  --pos-bg: #e7f4ec;
+  --neg: #c62828;        // red — WCAG AA on white
+  --neg-bg: #fdecea;
+
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.10);
+  --shadow-md: 0 6px 24px rgba(16, 24, 40, 0.10);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}

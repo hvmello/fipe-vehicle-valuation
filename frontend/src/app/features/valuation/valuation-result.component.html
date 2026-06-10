@@ -1,0 +1,56 @@
+@if (valuation(); as v) {
+  <mat-card class="result-card" appearance="outlined">
+    <header class="result-head">
+      <h2 class="result-head__title">{{ v.brand }} <span class="result-head__dot">·</span> {{ v.model }}</h2>
+      <div class="result-head__meta">
+        <span class="chip">FIPE {{ v.fipeCode }}</span>
+        <span class="chip chip--soft">Referência {{ v.referenceMonth }}</span>
+        <span class="chip chip--soft">{{ v.currency }}</span>
+      </div>
+    </header>
+
+    <div class="table-wrap">
+      <table mat-table [dataSource]="v.years" class="years-table">
+        <ng-container matColumnDef="label">
+          <th mat-header-cell *matHeaderCellDef>Ano</th>
+          <td mat-cell *matCellDef="let y">
+            <div class="year-cell">
+              <span class="year">{{ y.label }}</span>
+              <span class="fuel">{{ y.fuel }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="price">
+          <th mat-header-cell *matHeaderCellDef class="num">Valor</th>
+          <td mat-cell *matCellDef="let y" class="num price">
+            {{ y.price | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="variation">
+          <th mat-header-cell *matHeaderCellDef class="num">Variação</th>
+          <td mat-cell *matCellDef="let y" class="num">
+            @if (y.change === null) {
+              <span class="base">valor base</span>
+            } @else {
+              <div class="variation-cell">
+                <span class="delta" [class.up]="y.change > 0" [class.down]="y.change < 0">
+                  <mat-icon class="trend" aria-hidden="true">
+                    {{ y.change >= 0 ? 'trending_up' : 'trending_down' }}
+                  </mat-icon>
+                  <span class="delta__value">{{ y.change | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+                  <span class="delta__pct">({{ y.changePercent | number:'1.0-0':'pt-BR' }}%)</span>
+                </span>
+                <span class="rel">em relação a {{ y.previousLabel }}</span>
+              </div>
+            }
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columns"></tr>
+        <tr mat-row *matRowDef="let row; columns: columns"></tr>
+      </table>
+    </div>
+  </mat-card>
+}

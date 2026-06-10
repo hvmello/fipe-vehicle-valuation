@@ -1,0 +1,87 @@
+<mat-card class="selector-card" appearance="outlined">
+  <div class="selector-card__head">
+    <h2 class="selector-card__title">Consultar valorização</h2>
+    <p class="selector-card__subtitle">Selecione o tipo, a marca e o modelo do veículo</p>
+  </div>
+
+  <div class="form-grid">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Tipo</mat-label>
+      <mat-select [value]="selectedType()" (selectionChange)="onTypeChange($event.value)">
+        @for (type of vehicleTypes; track type.value) {
+          <mat-option [value]="type.value">{{ type.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Marca</mat-label>
+      <mat-select [value]="selectedBrand()" (selectionChange)="onBrandChange($event.value)"
+                  [disabled]="!selectedType() || loadingBrands()">
+        @for (brand of brands(); track brand.id) {
+          <mat-option [value]="brand.id">{{ brand.name }}</mat-option>
+        }
+      </mat-select>
+      @if (loadingBrands()) { <mat-hint>Carregando marcas…</mat-hint> }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Modelo</mat-label>
+      <!-- Type-ahead: a brand can have ~500 models, so the user filters by typing. -->
+      <input matInput type="text" placeholder="Digite para buscar…"
+             [formControl]="modelCtrl" [matAutocomplete]="modelAuto" (input)="onModelTyping()" />
+      <mat-icon matSuffix aria-hidden="true">search</mat-icon>
+      <mat-autocomplete #modelAuto="matAutocomplete" [displayWith]="displayModel"
+                        (optionSelected)="onModelSelected($event)" autoActiveFirstOption>
+        @for (model of filteredModels(); track model.id) {
+          <mat-option [value]="model">{{ model.name }}</mat-option>
+        }
+      </mat-autocomplete>
+      @if (loadingModels()) {
+        <mat-hint>Carregando modelos…</mat-hint>
+      } @else if (modelMatchCount() > modelResultLimit) {
+        <mat-hint>{{ modelMatchCount() }} modelos — refine a busca para ver mais</mat-hint>
+      }
+    </mat-form-field>
+
+    <button mat-flat-button color="primary" class="submit" type="button"
+            [disabled]="!canSubmit()" (click)="consultar()">
+      @if (loadingResult()) {
+        <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+      } @else {
+        <mat-icon aria-hidden="true">search</mat-icon>
+      }
+      <span>Consultar</span>
+    </button>
+  </div>
+</mat-card>
+
+@if (error(); as message) {
+  <div class="error-banner" role="alert">
+    <mat-icon aria-hidden="true">error_outline</mat-icon>
+    <span>{{ message }}</span>
+  </div>
+}
+
+@if (notice(); as message) {
+  <div class="notice-banner" role="status">
+    <mat-icon aria-hidden="true">search_off</mat-icon>
+    <span>{{ message }}</span>
+  </div>
+}
+
+@if (loadingResult()) {
+  <mat-card class="result-skeleton" appearance="outlined" aria-busy="true"
+            aria-label="Carregando valorização">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <div class="result-skeleton__rows">
+      @for (row of skeletonRows; track row) {
+        <div class="skeleton-row"></div>
+      }
+    </div>
+  </mat-card>
+} @else {
+  @if (result(); as valuation) {
+    <app-valuation-result [valuation]="valuation" />
+  }
+}

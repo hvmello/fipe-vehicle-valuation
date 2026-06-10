@@ -1,0 +1,122 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.selector-card {
+  border-radius: var(--radius);
+  border-color: var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-5);
+}
+
+.selector-card__head {
+  margin-bottom: var(--space-5);
+}
+
+.selector-card__title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.selector-card__subtitle {
+  margin: var(--space-1) 0 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+// All controls on one line on wide screens; wrap gracefully on smaller ones.
+.form-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.form-grid mat-form-field {
+  flex: 1 1 180px;   // grow to share the row, shrink, ~180px before wrapping
+  min-width: 0;
+}
+
+.submit {
+  flex: 0 0 auto;
+  height: 56px;      // matches the outlined field's input-box height for alignment
+  min-width: 150px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-sm);
+
+  mat-progress-spinner {
+    display: inline-block;
+  }
+}
+
+@media (max-width: 560px) {
+  .submit {
+    flex-basis: 100%;
+    width: 100%;
+  }
+}
+
+.error-banner,
+.notice-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+}
+
+.error-banner {
+  background: var(--neg-bg);
+  color: var(--neg);
+  border: 1px solid #f4c7c3;
+}
+
+.notice-banner {
+  background: var(--surface);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.result-skeleton {
+  border-radius: var(--radius);
+  border-color: var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  padding: 0;
+}
+
+.result-skeleton__rows {
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.skeleton-row {
+  height: 20px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--surface-muted) 25%, #e9edf5 37%, var(--surface-muted) 63%);
+  background-size: 400% 100%;
+  animation: skeleton-shimmer 1.4s ease infinite;
+}
+
+.skeleton-row:nth-child(1) { width: 80%; }
+.skeleton-row:nth-child(2) { width: 95%; }
+.skeleton-row:nth-child(3) { width: 88%; }
+.skeleton-row:nth-child(4) { width: 70%; }
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: 0 0; }
+}
+
