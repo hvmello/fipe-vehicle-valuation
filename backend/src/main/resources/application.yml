@@ -53,7 +53,3 @@ management:
 logging:
   level:
     com.fipe.valuation: INFO
-    # Caffeine logs every exceptionally-completed load future at WARN (incl. expected FIPE 404s).
-    # Those are normal client outcomes mapped to a 404 ProblemDetail; real upstream failures are
-    # still logged by GlobalExceptionHandler. Silence the duplicate, noisy stack traces.
-    com.github.benmanes.caffeine.cache.LocalAsyncCache: 'OFF'
