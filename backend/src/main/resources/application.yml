@@ -1,0 +1,55 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: fipe-vehicle-valuation
+
+fipe:
+  # Primary FIPE v2 base URL (see specs/001-vehicle-valuation/api-contract.md Part B).
+  base-url: https://fipe.parallelum.com.br/api/v2
+  # Optional X-Subscription-Token; blank = unauthenticated (rate-limited free tier).
+  subscription-token: ${FIPE_SUBSCRIPTION_TOKEN:}
+  connect-timeout: 5s
+  response-timeout: 10s
+  # Upper bound on concurrent per-year price calls.
+  max-concurrency: 8
+  # FIPE response cache (NFR-4). Two tiers, each bounded so only the hot working set stays in RAM
+  # (Caffeine W-TinyLFU evicts cold entries). Stats at /actuator/metrics/cache.gets
+  # (tags: cache=fipe.catalog | fipe.prices). Tune freely here without touching code.
+  cache:
+    # Brands/models/years: stable, reference-independent — keep them warm for a long time.
+    catalog:
+      ttl: 7d
+      maximum-size: 2000
+    # Prices: change monthly. Keyed by FIPE's current reference table and invalidated on rollover;
+    # the TTL is only a safety net.
+    price:
+      ttl: 24h
+      maximum-size: 20000
+    # How often to re-check FIPE's current reference table (a change triggers a price-cache refresh).
+    reference-refresh: 24h
+  cors:
+    allowed-origins:
+      - http://localhost:4200
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+  api-docs:
+    path: /v3/api-docs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # Health for liveness; metrics to inspect FIPE cache hit/miss/eviction counters (NFR-4).
+        include: health, info, metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+logging:
+  level:
+    com.fipe.valuation: INFO
