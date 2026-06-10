@@ -46,4 +46,12 @@ describe('ValuationResultComponent', () => {
   it('UI-4: oldest year shows the base value, no variation', () => {
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('valor base');
   });
+
+  it('UI-6: header shows brand, model, FIPE code and reference month', () => {
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Fiat');
+    expect(text).toContain('147 C/ CL');
+    expect(text).toContain('001124-0');
+    expect(text).toContain('junho de 2026');
+  });
 });
