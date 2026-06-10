@@ -70,6 +70,15 @@ small slice; type and brand stay as dropdowns (small, fixed sets).
 Every test references the FR/NFR id it verifies, so behaviour maps back to a requirement.
 **Why:** maximises reviewability and protects intent during refactors.
 
+## 11. `npm audit` posture — don't force-break the toolchain
+`npm audit` reports advisories in the **Angular build toolchain** (e.g. webpack `buildHttp`/
+`HttpUriPlugin` SSRF). These are **build-time only** — they are not part of the bundle shipped to the
+browser, and we don't use the affected features. The only "fix" npm offers is `npm audit fix --force`,
+which pulls `@angular-devkit/build-angular` from 18 → 21 — a **breaking** framework-major upgrade.
+**Decision:** stay on Angular 18 (the brief's stack) and **do not** force-upgrade for a dev-only
+advisory; CI installs with `--no-audit --no-fund` to keep logs clean. Bumping Angular's major is a
+deliberate, separately-tested change — not something to slip into a take-home via `--force`.
+
 ---
 
 ### Environment note — corporate TLS proxy
