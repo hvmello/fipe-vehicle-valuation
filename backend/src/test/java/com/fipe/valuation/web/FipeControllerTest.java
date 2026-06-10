@@ -9,6 +9,7 @@ import com.fipe.valuation.domain.VehicleValuation;
 import com.fipe.valuation.domain.YearValuation;
 import com.fipe.valuation.exception.FipeIntegrationException;
 import com.fipe.valuation.exception.FipeNotFoundException;
+import com.fipe.valuation.exception.FipeRateLimitException;
 import com.fipe.valuation.service.VehicleValuationService;
 import java.math.BigDecimal;
 import java.util.List;
@@ -108,5 +109,18 @@ class FipeControllerTest {
                 .expectBody()
                 .jsonPath("$.status").isEqualTo(502)
                 .jsonPath("$.title").isEqualTo("FIPE service unavailable");
+    }
+
+    @Test
+    @DisplayName("FR-12/NFR-8: FipeRateLimitException (429) → 503 ProblemDetail")
+    void rateLimitIsMapped() {
+        when(valuationService.valuate(VehicleType.CARS, "21", "437"))
+                .thenReturn(Mono.error(new FipeRateLimitException("FIPE rate limit reached (429)")));
+
+        web.get().uri("/api/v1/cars/brands/21/models/437/valuation").exchange()
+                .expectStatus().isEqualTo(503)
+                .expectBody()
+                .jsonPath("$.status").isEqualTo(503)
+                .jsonPath("$.title").isEqualTo("FIPE rate limit reached");
     }
 }

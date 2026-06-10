@@ -6,6 +6,7 @@ import com.fipe.valuation.client.dto.FipeVehiclePrice;
 import com.fipe.valuation.domain.VehicleType;
 import com.fipe.valuation.exception.FipeIntegrationException;
 import com.fipe.valuation.exception.FipeNotFoundException;
+import com.fipe.valuation.exception.FipeRateLimitException;
 import java.time.Duration;
 import java.util.function.Function;
 import org.springframework.stereotype.Component;
@@ -110,12 +111,19 @@ public class FipeClientImpl implements FipeClient {
      */
     private Function<Throwable, Throwable> translate(String resource) {
         return error -> {
-            if (error instanceof FipeNotFoundException || error instanceof FipeIntegrationException) {
+            if (error instanceof FipeNotFoundException
+                    || error instanceof FipeRateLimitException
+                    || error instanceof FipeIntegrationException) {
                 return error;
             }
             if (error instanceof WebClientResponseException wcre) {
-                if (wcre.getStatusCode().value() == 404) {
+                int status = wcre.getStatusCode().value();
+                if (status == 404) {
                     return new FipeNotFoundException("FIPE resource not found: " + resource);
+                }
+                if (status == 429) {
+                    return new FipeRateLimitException(
+                            "FIPE rate limit reached (429) while fetching " + resource, wcre);
                 }
                 return new FipeIntegrationException(
                         "FIPE returned " + wcre.getStatusCode() + " for " + resource, wcre);

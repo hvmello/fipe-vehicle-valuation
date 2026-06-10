@@ -10,6 +10,7 @@ import com.fipe.valuation.client.dto.FipeVehiclePrice;
 import com.fipe.valuation.domain.VehicleType;
 import com.fipe.valuation.exception.FipeIntegrationException;
 import com.fipe.valuation.exception.FipeNotFoundException;
+import com.fipe.valuation.exception.FipeRateLimitException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntFunction;
@@ -158,5 +159,16 @@ class FipeClientImplTest {
         assertThatThrownBy(() -> client.models(VehicleType.CARS, "99999999").collectList().block())
                 .isInstanceOf(FipeNotFoundException.class);
         assertThat(callCount.get()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("FR-12/NFR-8: a persistent 429 is retried then mapped to FipeRateLimitException")
+    void rateLimitIsRetriedThenMapped() {
+        FipeClient client = clientReturning(attempt ->
+                jsonResponse(HttpStatus.TOO_MANY_REQUESTS, "{\"error\":\"rate limit\"}"));
+
+        assertThatThrownBy(() -> client.brands(VehicleType.CARS).collectList().block())
+                .isInstanceOf(FipeRateLimitException.class);
+        assertThat(callCount.get()).isEqualTo(3); // original + two retries (429 is transient)
     }
 }
