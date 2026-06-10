@@ -1,0 +1,16 @@
+# Normalize line endings: stored LF in the repo, checked out native on each OS.
+* text=auto
+
+# Scripts must keep their native endings.
+*.sh    text eol=lf
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+mvnw    text eol=lf
+
+# Treat known binaries as binary (never diffed/normalized).
+*.jar   binary
+*.png   binary
+*.jpg   binary
+*.ico   binary
+*.woff  binary
+*.woff2 binary
