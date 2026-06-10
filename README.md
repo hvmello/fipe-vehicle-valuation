@@ -1,5 +1,7 @@
 # FIPE Vehicle Valuation
 
+[![CI](https://github.com/hvmello/fipe-vehicle-valuation/actions/workflows/ci.yml/badge.svg)](https://github.com/hvmello/fipe-vehicle-valuation/actions/workflows/ci.yml)
+
 A microservice (**Java 17 / Spring Boot, WebFlux**) that consumes the
 [FIPE v2 API](https://fipe.online/docs/api/fipe) and, given a **vehicle type + brand + model**,
 returns each manufacture year's price plus the **absolute and percentage variation versus the
@@ -29,7 +31,8 @@ Angular 18 (Material)  ──HTTP /api/v1──▶  Spring Boot service  ──H
 
 - **JDK 17+** (built/tested on Temurin 21; bytecode targets 17).
 - **Node 20+ / npm**, and **Google Chrome** (for `ng test`).
-- Maven — or **mvnd** (Maven Daemon). Examples below use `mvnd`; substitute `mvn` if installed.
+- **No Maven install needed** — the project ships the **Maven Wrapper** (`./mvnw`), which fetches the
+  right Maven version automatically. (If you already have `mvn`/`mvnd`, those work too.)
 
 ### Corporate TLS proxy note (only if `npm install` fails with a certificate error)
 
@@ -58,7 +61,7 @@ mvnd spring-boot:run "-Dspring-boot.run.jvmArguments=-Djavax.net.ssl.trustStoreT
 
 ```bash
 cd backend
-mvnd spring-boot:run          # starts on http://localhost:8080
+./mvnw spring-boot:run        # starts on http://localhost:8080  (mvnw.cmd on Windows)
 ```
 
 Sample request (newest-first valuation for Fiat 147):
@@ -97,9 +100,11 @@ Then pick **Tipo → Marca → Modelo** and press **Consultar**. (Run the backen
 ## Tests
 
 ```bash
-cd backend  && mvnd test          # 54 tests (unit, service, controller, integration, security, cache, references)
-cd frontend && npm run test:ci    # 8 specs (service + components), headless Chrome
+cd backend  && ./mvnw test        # 54 tests (unit, service, controller, integration, security, cache, references)
+cd frontend && npm run test:ci    # 9 specs (service + components), headless Chrome
 ```
+
+Both suites run automatically on every push/PR via [GitHub Actions](.github/workflows/ci.yml).
 
 ## Notable design decisions
 
@@ -125,3 +130,9 @@ cd frontend && npm run test:ci    # 8 specs (service + components), headless Chr
 - **pt-BR currency parsing** via a locale-pinned `DecimalFormat` (no regex), with strict
   full-consumption validation so malformed amounts are rejected, not silently truncated.
 - **Swagger UI** (springdoc) at `/swagger-ui.html`; the full contract is also in `specs/.../api-contract.md`.
+
+See [`docs/DECISIONS.md`](docs/DECISIONS.md) for the trade-offs behind each choice.
+
+## License
+
+Released under the [MIT License](LICENSE).
