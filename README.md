@@ -11,6 +11,42 @@ previous available year**, newest first — with an **Angular 18 + Material** sc
 > `2013 → R$25.000,00 (+R$2.500,00, 11% vs 2011)`, `2011 → +R$2.250,00 (11% vs 2010)`, … ,
 > `2009 → base value`. Note 2012 is absent, so 2013 compares to **2011** (the previous *available* year).
 
+## See it working
+
+![Valuation screen showing Fiat 147 prices by year, with absolute and percentage variation](docs/demo.png)
+
+Real call against the live FIPE API (reference month November 2026):
+
+```bash
+curl "http://localhost:8080/api/v1/cars/brands/21/models/437/valuation"
+```
+
+```json
+{
+  "brand": "Fiat", "model": "147 C/ CL", "fipeCode": "001124-0",
+  "referenceMonth": "novembro de 2026", "currency": "BRL",
+  "years": [
+    { "year": 1987, "fuel": "Gasolina", "price": 6155.00, "change": 178.00,  "changePercent": 2.98,  "previousYear": 1986 },
+    { "year": 1986, "fuel": "Gasolina", "price": 5977.00, "change": 1132.00, "changePercent": 23.36, "previousYear": 1985 },
+    { "year": 1985, "fuel": "Gasolina", "price": 4845.00, "change": null,    "changePercent": null,  "previousYear": null }
+  ]
+}
+```
+
+| Measured locally | Result |
+|---|---|
+| Backend test suite (`./mvnw test`) | 56 passed, 0 failed |
+| First request (cache miss, calls FIPE) | 156 ms |
+| Same request again (Caffeine hit) | 7 ms |
+
+## Why it is different
+
+- **The cache knows when the data changes.** Prices are keyed by FIPE's reference-table code, so a new
+  monthly table invalidates them at once; the TTL is only a safety net.
+- **Built to stay under a third-party rate limit**: bounded concurrent fan-out plus two cache tiers.
+- **Every test traces to a requirement** in the spec, and each design choice is written down with the
+  alternative it was chosen against.
+
 The design is **spec-driven**: the source of truth is [`specs/001-vehicle-valuation/`](specs/001-vehicle-valuation)
 (functional spec, data model, API contract, tasks), and every test references the requirement id it verifies.
 The design choices (and what they were chosen against) are explained in plain language in
